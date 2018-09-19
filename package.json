@@ -1,0 +1,29 @@
+{
+  "name": "react-native-scrollable-topbar",
+  "version": "1.0.0",
+  "description": "基于React Native封装的资讯频道切换TopBar",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mengft/react-native-scrollable-topbar.git"
+  },
+  "keywords": [
+    "React Native",
+    "react-native-scrollable-topbar",
+    "ScrollTopBar"
+  ],
+  "author": "fantao.meng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mengft/react-native-scrollable-topbar/issues"
+  },
+  "homepage": "https://github.com/mengft/react-native-scrollable-topbar#readme",
+  "dependencies": {
+    "prop-types": "^15.6.2",
+    "react": "16.4.1",
+    "react-native": "0.56.0"
+  }
+}
