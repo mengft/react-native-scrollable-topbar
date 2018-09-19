@@ -1,5 +1,9 @@
 # react-native-scrollable-topbar
-基于React Native封装的资讯频道TopBar
+基于React Native封装的资讯频道TopBar，常见于新闻客户端，具体实现功能如下：
+* TopBar区域可手动滑动(Underline 联动)
+* 点击频道实现内容区切换
+* 根据内容区(this.props.children)触摸手势实现频道切换
+* 频道位置校准，左右边界临界位置处理，实现自动滑动校准
 
 ## Installation
 
