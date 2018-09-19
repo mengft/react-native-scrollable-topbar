@@ -10,9 +10,6 @@
 ```bash
 npm install react-native-scrollable-topbar --save
 ```
-```bash
-yarn add react-native-scrollable-topbar --save
-```
 
 ## Import into your project
 ```js
