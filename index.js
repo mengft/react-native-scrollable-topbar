@@ -2,7 +2,7 @@
  * @Author: fantao.meng
  * @Date: 2018-08-26 18:22:30
  * @Last Modified by: fantao.meng
- * @Last Modified time: 2018-09-19 11:20:17
+ * @Last Modified time: 2018-09-20 15:33:45
  */
 
 import React, { ReactDOM, ReactChildren, ReactElement } from 'react';
@@ -12,9 +12,9 @@ import {
 import * as PropTypes from 'prop-types';
 
 const Metrics = Dimensions.get('window');
-const UNDERLINE_WIDTH = 60;			// 下划线宽度
 const ITEM_GRAP = 10;				// 图片之间的grap
 const ANIMATED_DURATION = 500;		// 动画duration
+let UNDERLINE_WIDTH = 60;			// 下划线宽度
 
 class ScrollTopBar extends React.Component {
 	static propTypes = {
@@ -29,9 +29,7 @@ class ScrollTopBar extends React.Component {
 	};
 
 	static defaultProps = {
-		topBarUnderlineStyle: {
-			backgroundColor: '#298eff', height: 4, width: UNDERLINE_WIDTH, marginTop: -4,
-		},
+		topBarUnderlineStyle: {},
 		labelList: ['推荐', '军事', '政治', '财经', '娱乐', '社会', '生活', '美食', '旅行'],
 		topBarInactiveTextColor: '#aab9ca',
 		topBarActiveTextColor: '#298eff',
@@ -50,6 +48,17 @@ class ScrollTopBar extends React.Component {
 		this.topBarContentWidth = 0;
 		this.touchMove = { pageX: -1, pageY: -1 };		// 记录内容区手势
 		this.clickHistory = [0];
+	}
+
+	componentWillMount () {
+		console.log('componentWillMount');
+		let topBarUnderlineStyle = this.props.topBarUnderlineStyle;
+		if (typeof topBarUnderlineStyle === 'object') {
+			if ('width' in topBarUnderlineStyle) UNDERLINE_WIDTH = topBarUnderlineStyle['width'];
+		} else if (typeof topBarUnderlineStyle === 'number') {
+			let styleObject = StyleSheet.flatten(topBarUnderlineStyle);
+			if ('width' in styleObject) UNDERLINE_WIDTH = styleObject['width'];
+		}
 	}
 
 	componentDidMount() {
@@ -251,66 +260,41 @@ class ScrollTopBar extends React.Component {
 	}
 
 	/**
-	 * 渲染列表内容
-	 */
-	renderContent() {
-    	return (
-			<Animated.View style={{
-				flexDirection: 'row',
-				width: Metrics.width * this.props.labelList.length,
-				transform: [{ translateX: this.state.position }],
-			}}
-			>
-				{React.Children.map(this.props.children, (child, index) => {
-					const props = {
-						...child.props,
-						onMoveShouldSetResponder: e => true,
-						// onResponderRelease: e => this.onPanResponderRelease({ dx: e.nativeEvent.locationX, dy: e.nativeEvent.locationY }),
-						onTouchStart: e => this.onTouchMove('start', e.nativeEvent),
-						onTouchEnd: e => this.onTouchMove('end', e.nativeEvent),
-					};
-					return this.clickHistory.indexOf(index) !== -1 
-						? 	<View {...props} style={{ flex: 1 }}>{React.cloneElement(child, props)}</View>
-						: 	<View {...props} style={{ width: Metrics.width, height: Metrics.height }} />
-				})}
-			</Animated.View>
-    	);
-	}
-
-	/**
      * 渲染TopBar
      */
 	renderTopBar() {
     	return (
-			<ScrollView
-				ref={e => { if (e) this.scrollview = e }}
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={{ backgroundColor: this.props.topBarBackgroundColor }}
-				>
-				<View>
-					<View style={{ flexDirection: 'row', aliginItems: 'center' }}>
-						{ this.props.labelList.map((item, index) => {
-							const check = this.state.index === index;
-							const title = typeof item === 'object' ? item.title : item;
-							return (
-								<TouchableWithoutFeedback key={index} onPress={() => this.switchTopBar(index)} key={index}>
-									<View
-										ref={`topBar${index}`}
-										collapsable={false}
-										style={{
-											justifyContent: 'center', padding: ITEM_GRAP, paddingTop: Platform.OS === 'ios' ? 30 : 0, paddingBottom: 20, backgroundColor: this.props.topBarBackgroundColor,
-										}}
-									>
-										<Text style={[{ color: this.props.topBarInactiveTextColor }, check && { color: this.props.topBarActiveTextColor }]}>{title}</Text>
-									</View>
-								</TouchableWithoutFeedback>
-							);
-						})}
+			<View>
+				<ScrollView
+					ref={e => { if (e) this.scrollview = e }}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					style={{ backgroundColor: this.props.topBarBackgroundColor }}
+					>
+					<View>
+						<View style={{ flexDirection: 'row', aliginItems: 'center' }}>
+							{ this.props.labelList.map((item, index) => {
+								const check = this.state.index === index;
+								const title = typeof item === 'object' ? item.title : item;
+								return (
+									<TouchableWithoutFeedback key={index} onPress={() => this.switchTopBar(index)} key={index}>
+										<View
+											ref={`topBar${index}`}
+											collapsable={false}
+											style={{
+												justifyContent: 'center', padding: ITEM_GRAP, paddingTop: Platform.OS === 'ios' ? 30 : 0, paddingBottom: 20, backgroundColor: this.props.topBarBackgroundColor,
+											}}
+										>
+											<Text style={[{ color: this.props.topBarInactiveTextColor }, check && { color: this.props.topBarActiveTextColor }]}>{title}</Text>
+										</View>
+									</TouchableWithoutFeedback>
+								);
+							})}
+						</View>
+						{this.renderTopUnderline()}
 					</View>
-					{this.renderTopUnderline()}
-				</View>
-			</ScrollView>
+				</ScrollView>
+			</View>
     	);
 	}
 
@@ -319,8 +303,36 @@ class ScrollTopBar extends React.Component {
 	 */
 	renderTopUnderline() {
 		return (
-			<Animated.View ref={e => { if (e) this.underline = e }} style={[{ transform: [{ translateX: this.state.underline }] }, this.props.topBarUnderlineStyle]} />
+			<Animated.View ref={e => { if (e) this.underline = e }} style={[{ transform: [{ translateX: this.state.underline }], backgroundColor: '#298eff', height: 4, width: UNDERLINE_WIDTH, marginTop: -4 }, this.props.topBarUnderlineStyle]} />
 		);
+	}
+
+	/**
+	 * 渲染列表内容
+	 */
+	renderContent() {
+    	return (
+			<Animated.View style={{
+				flex: 1,
+				flexDirection: 'row',
+				width: Metrics.width * this.props.labelList.length,
+				transform: [{ translateX: this.state.position }],
+			}}
+			>
+				{React.Children.map(this.props.children, (child, index) => {
+					const props = {
+						...child.props,
+						// onMoveShouldSetResponder: e => true,
+						// onResponderRelease: e => this.onPanResponderRelease({ dx: e.nativeEvent.locationX, dy: e.nativeEvent.locationY }),
+						onTouchStart: e => this.onTouchMove('start', e.nativeEvent),
+						onTouchEnd: e => this.onTouchMove('end', e.nativeEvent),
+					};
+					return this.clickHistory.indexOf(index) !== -1
+						? 	<View {...props} style={{ flex: 1 }}>{React.cloneElement(child, props)}</View>
+						: 	<View style={{ flex: 1 }} />
+				})}
+			</Animated.View>
+    	);
 	}
 
 	render() {
@@ -334,7 +346,7 @@ class ScrollTopBar extends React.Component {
 }
 
 const Styles = StyleSheet.create({
-	container: { backgroundColor: '#eceff4' },
+	container: { flex: 1, backgroundColor: '#eceff4' },
 });
 
 export default ScrollTopBar;
