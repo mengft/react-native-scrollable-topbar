@@ -1,6 +1,6 @@
 {
   "name": "react-native-scrollable-topbar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "基于React Native封装的资讯频道切换TopBar",
   "main": "index.js",
   "scripts": {
